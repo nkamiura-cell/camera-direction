@@ -449,7 +449,21 @@ body.print-a3{--print-size:a3}
 })();
 </script>
 
-</head>
+<script>
+(function(){
+ const p=new URLSearchParams(location.search), fresh=p.get('fresh')==='1', id=p.get('project');
+ if(id) window.KOBAN_PROJECT_ID=id;
+ window.KOBAN_PROJECT_CONTEXT={id:id||null,fresh:fresh};
+ if(fresh){
+   try{
+     Object.keys(localStorage).forEach(function(k){
+       if(/koban|project|cut|shoot|material|upload/i.test(k) && k!=='koban_projects_v4') localStorage.removeItem(k);
+     });
+     sessionStorage.clear();
+   }catch(e){}
+ }
+})();
+</script></head>
 <body><a href="index.html" style="position:fixed;left:18px;top:18px;z-index:99999;font:11px Arial;color:#666;text-decoration:none;background:#fff;border:1px solid #ddd;border-radius:7px;padding:7px 10px">← 案件一覧</a>
 <header class="topbar">
 <div class="logo">KOBAN AI</div><div class="project">ナック様｜採用パンフレット撮影</div><div class="spacer"></div>
