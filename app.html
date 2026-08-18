@@ -2061,8 +2061,8 @@ let activeLayoutMapIndex=0;
 let activeLayoutPage=1;
 let activeLayoutFileUrl='';
 const preparedMaterialPreviews={};
-const MAX_MATERIAL_BATCH_BYTES=3.2*1024*1024;
-const MAX_DIRECT_FILE_BYTES=3.2*1024*1024;
+const MAX_MATERIAL_BATCH_BYTES=2.6*1024*1024;
+const MAX_DIRECT_FILE_BYTES=2.6*1024*1024;
 function fileKind(name){const e=(name.split('.').pop()||'').toLowerCase();if(e==='pdf')return'PDF';if(['ppt','pptx'].includes(e))return'PPT';if(['doc','docx'].includes(e))return'DOC';if(['jpg','jpeg','png','webp'].includes(e))return'IMG';return'TXT';}
 function roleLabel(role){return role==='layout'?'台割・デザイン':role==='overview'?'案件前提':role==='reference'?'参考資料':'AI判定待ち';}
 function renderUploaded(){const root=document.getElementById('projectUploaded');if(!root)return;root.innerHTML=projectUploads.all.map((f,i)=>`<div class="uploaded-item"><div class="fileicon">${fileKind(f.name)}</div><div class="filemeta"><div class="filename">${escapeHtml(f.name)}</div><div class="filesub">${Math.max(1,Math.round(f.size/1024))} KB</div></div><span class="file-role">${roleLabel(f.role)}</span><button onclick="removeProjectFile(${i});return false">×</button></div>`).join('');}
@@ -2079,20 +2079,22 @@ async function getPdfJs(){
   return mod;
 }
 
-async function canvasToSmallJpeg(canvas,name,baseScale=1){
-  let scale=baseScale, quality=.70, blob=null;
-  for(let attempt=0;attempt<5;attempt++){
-    const c=document.createElement('canvas');
-    const maxDim=1800;
+async function canvasToSmallJpeg(canvas,name){
+  const targetBytes=2.35*1024*1024;
+  let maxDim=Math.min(1800,Math.max(canvas.width,canvas.height));
+  let quality=.68;
+  let blob=null;
+  for(let attempt=0;attempt<8;attempt++){
     const ratio=Math.min(1,maxDim/Math.max(canvas.width,canvas.height));
+    const c=document.createElement('canvas');
     c.width=Math.max(1,Math.round(canvas.width*ratio));
     c.height=Math.max(1,Math.round(canvas.height*ratio));
     const ctx=c.getContext('2d',{alpha:false});
-    ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(canvas,0,0,c.width,c.height);
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+    ctx.drawImage(canvas,0,0,c.width,c.height);
     blob=await new Promise(resolve=>c.toBlob(resolve,'image/jpeg',quality));
-    if(blob && blob.size<=MAX_MATERIAL_BATCH_BYTES*.72) return new File([blob],name,{type:'image/jpeg'});
-    quality-=.08;
-    if(quality<.42){scale*=.82;quality=.68;}
+    if(blob && blob.size<=targetBytes) return new File([blob],name,{type:'image/jpeg'});
+    if(quality>.42) quality-=.07; else {maxDim=Math.round(maxDim*.78);quality=.62;}
   }
   return new File([blob],name,{type:'image/jpeg'});
 }
@@ -2158,17 +2160,23 @@ function makeMaterialBatches(items){
 }
 
 async function analyzeMaterialBatch(batch,endpoint,batchIndex,total,onProgress){
-  const form=new FormData();
-  batch.forEach(x=>{form.append('files',x.file,x.name);form.append('roles','auto');});
-  onProgress?.(`AI解析中… ${batchIndex} / ${total}`);
-  const res=await fetch(endpoint,{method:'POST',body:form});
-  const raw=await res.text();
-  let data;try{data=JSON.parse(raw);}catch(_){
-    if(raw.includes('Request Entity Too Large')||res.status===413) throw new Error('資料の送信サイズ制限に達しました。ファイルを自動分割・圧縮できない形式の可能性があります。');
-    throw new Error(raw.slice(0,240)||'AI解析サーバーからJSON以外の応答が返りました');
+  const results=[];
+  for(let bi=0;bi<batch.length;bi++){
+    const x=batch[bi];
+    const form=new FormData();
+    form.append('files',x.file,x.name);
+    form.append('roles','auto');
+    onProgress?.(`AI解析中… ${batchIndex} / ${total}・${bi+1} / ${batch.length}`);
+    const res=await fetch(endpoint,{method:'POST',body:form});
+    const raw=await res.text();
+    let data;try{data=JSON.parse(raw);}catch(_){
+      if(raw.includes('Request Entity Too Large')||res.status===413) throw new Error(`資料「${x.name}」の送信サイズ制限に達しました。自動圧縮後も大きすぎる可能性があります。`);
+      throw new Error(raw.slice(0,240)||'AI解析サーバーからJSON以外の応答が返りました');
+    }
+    if(!res.ok)throw new Error(data.error||`「${x.name}」の解析に失敗しました`);
+    results.push(data);
   }
-  if(!res.ok)throw new Error(data.error||'解析に失敗');
-  return data;
+  return mergeMaterialResults(results);
 }
 
 function mergeMaterialResults(results){
