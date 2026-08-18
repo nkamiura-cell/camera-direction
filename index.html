@@ -1,18 +1,36 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KOBAN｜案件一覧</title><style>
 body{margin:0;background:#f5f5f2;color:#222;font-family:Arial,'Noto Sans JP',sans-serif}.wrap{max-width:1050px;margin:auto;padding:48px 28px}.top{display:flex;justify-content:space-between;align-items:end;margin-bottom:28px}h1{margin:0;font-size:28px}.ey{font-size:10px;color:#999;letter-spacing:.12em;margin-bottom:8px}.new,.open{border:0;background:#262824;color:#fff;border-radius:7px;padding:10px 14px;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:20px;min-height:130px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between}.name{font-size:18px;font-weight:600}.client,.meta{font-size:11px;color:#777;margin-top:7px}.meta{display:flex;justify-content:space-between}.modal{display:none;position:fixed;inset:0;background:#0005;align-items:center;justify-content:center}.modal.show{display:flex}.box{background:#fff;padding:24px;border-radius:12px;width:min(420px,calc(100% - 40px))}.box h2{margin-top:0}.box input{width:100%;box-sizing:border-box;padding:10px;margin:6px 0 12px;border:1px solid #ddd;border-radius:6px}.actions{text-align:right}.cancel{padding:9px 13px;border:1px solid #ddd;background:#fff;border-radius:6px;margin-right:6px}.create{padding:9px 13px;border:0;background:#262824;color:#fff;border-radius:6px}@media(max-width:700px){.grid{grid-template-columns:1fr}}
-</style></head><body><div class="wrap"><div class="top"><div><div class="ey">KOBAN / CAMERA DIRECTION</div><h1>案件一覧</h1><div style="font-size:10px;color:#999;margin-top:8px">案件名・企業名は一覧に表示されません</div></div><button class="new" onclick="showNew()">＋ 新規案件</button></div><div id="grid" class="grid"></div></div>
+
+.tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid #ddd}
+.tab{border:0;background:transparent;padding:9px 12px;font-size:11px;color:#888;cursor:pointer;border-bottom:2px solid transparent}
+.tab.active{color:#222;border-bottom-color:#262824}
+.empty{padding:60px 20px;text-align:center;color:#999;background:#fff;border:1px dashed #ddd;border-radius:12px}
+.more-wrap{position:relative}
+.more{border:0;background:transparent;color:#888;letter-spacing:2px;padding:3px 4px;cursor:pointer}
+.menu{display:none;position:absolute;right:0;bottom:24px;z-index:20;width:145px;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.10);padding:5px}
+.menu.show{display:block}
+.menu button{display:block;width:100%;border:0;background:#fff;text-align:left;padding:9px 10px;border-radius:5px;font-size:11px;cursor:pointer}
+.menu button:hover{background:#f5f5f2}
+.menu .danger{color:#b33}
+</style></head><body><div class="wrap"><div class="top"><div><div class="ey">KOBAN / CAMERA DIRECTION</div><h1>案件一覧</h1><div style="font-size:10px;color:#999;margin-top:8px">案件名・企業名は一覧に表示されません</div></div><button class="new" onclick="showNew()">＋ 新規案件</button></div><div class="tabs"><button class="tab active" data-view="active" onclick="switchView('active')">案件一覧</button><button class="tab" data-view="archived" onclick="switchView('archived')">アーカイブ</button></div><div id="grid" class="grid"></div></div>
 <div id="modal" class="modal"><div class="box"><h2>新規案件</h2><label>案件情報</label><input id="pn" placeholder="案件を識別するための名称（一覧には表示されません）"><label>クライアント情報</label><input id="pc" placeholder="企業名（一覧には表示されません）"><div class="actions"><button class="cancel" onclick="hideNew()">キャンセル</button><button class="create" onclick="create()">案件を作成</button></div></div></div>
 <script>
-const K='koban_projects_v2',seed=[
-  {id:'project-01',status:'撮影設計中'},
-  {id:'project-02',status:'撮影設計中'}
+const K='koban_projects_v3',seed=[
+  {id:'project-01',status:'撮影設計中',archived:false},
+  {id:'project-02',status:'撮影設計中',archived:false}
 ];
 function list(){try{let x=JSON.parse(localStorage.getItem(K));if(x)return x}catch(e){}localStorage.setItem(K,JSON.stringify(seed));return seed}
 function save(x){localStorage.setItem(K,JSON.stringify(x))}
 function esc(x){return String(x||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+let view='active';
 function render(){
-  let x=list();
-  document.getElementById('grid').innerHTML=x.map((p,i)=>`
+  const x=list().filter(p=>view==='archived'?p.archived===true:p.archived!==true);
+  const grid=document.getElementById('grid');
+  if(!x.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1">該当する案件はありません。</div>';
+    return;
+  }
+  grid.innerHTML=x.map((p,i)=>`
     <div class="card" onclick="openP('${p.id}')">
       <div>
         <div class="ey">PROJECT ${String(i+1).padStart(2,'0')}</div>
@@ -20,13 +38,60 @@ function render(){
       </div>
       <div class="meta">
         <span>${esc(p.status||'未着手')}</span>
-        <span>撮影設計</span>
+        <span class="more-wrap" onclick="event.stopPropagation()">
+          <button class="more" onclick="toggleMenu(event,'${p.id}')">•••</button>
+          <div class="menu" id="menu-${p.id}">
+            ${view==='active'
+              ? `<button onclick="archiveProject(event,'${p.id}')">アーカイブ</button>`
+              : `<button onclick="restoreProject(event,'${p.id}')">アーカイブから戻す</button>`}
+            <button class="danger" onclick="deleteProject(event,'${p.id}')">削除</button>
+          </div>
+        </span>
       </div>
-    </div>`).join('')
+    </div>`).join('');
 }
 function openP(id){location.href='app.html?project='+encodeURIComponent(id)}
 function showNew(){document.getElementById('modal').classList.add('show');document.getElementById('pn').focus()}
 function hideNew(){document.getElementById('modal').classList.remove('show')}
-function create(){let n=document.getElementById('pn').value.trim(),c=document.getElementById('pc').value.trim();if(!n)return;let x=list();let id='p_'+Date.now().toString(36);x.unshift({id,status:'未着手'});save(x);openP(id)}
+function create(){
+  let n=document.getElementById('pn').value.trim(),c=document.getElementById('pc').value.trim();
+  if(!n)return;
+  let x=list(),id='p_'+Date.now().toString(36);
+  x.unshift({id,status:'未着手',archived:false});
+  save(x);
+  openP(id);
+}
+function toggleMenu(e,id){
+  e.stopPropagation();
+  document.querySelectorAll('.menu.show').forEach(m=>m.classList.remove('show'));
+  const m=document.getElementById('menu-'+id);
+  if(m)m.classList.toggle('show');
+}
+function archiveProject(e,id){
+  e.stopPropagation();
+  const x=list(),p=x.find(v=>v.id===id);
+  if(!p)return;
+  p.archived=true;
+  save(x);render();
+}
+function restoreProject(e,id){
+  e.stopPropagation();
+  const x=list(),p=x.find(v=>v.id===id);
+  if(!p)return;
+  p.archived=false;
+  save(x);render();
+}
+function deleteProject(e,id){
+  e.stopPropagation();
+  if(!confirm('この案件を完全に削除しますか？\\n削除した案件は元に戻せません。'))return;
+  save(list().filter(p=>p.id!==id));
+  render();
+}
+function switchView(v){
+  view=v;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+  render();
+}
+document.addEventListener('click',()=>document.querySelectorAll('.menu.show').forEach(m=>m.classList.remove('show')));
 render();
 </script></body></html>
