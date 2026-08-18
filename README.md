@@ -82,3 +82,7 @@ Vercelの Project Settings → Environment Variables に以下を設定します
 - ディレクターは従来どおり通常の「AI＋Web / Web」検索を使うだけ
 - Web画像を探す際、バックエンドがPinterest限定検索を先に実行し、その後に一般Web検索を実行
 - Pinterestは「選択肢」ではなく「AIが積極的に参照するソース」という位置付け
+
+
+## v38 案件一覧
+既存KOBANをapp.htmlとして維持し、index.htmlを案件一覧の入口に変更。案件選択はproject ID付きで既存画面へ遷移。新規案件はブラウザのlocalStorageで管理。
