@@ -8,7 +8,7 @@ function isSupported(name,mime=''){ return isImage(mime,name) || ['pdf','ppt','p
 function parseMultipart(req){
   return new Promise((resolve,reject)=>{
     let bb;
-    try{ bb=Busboy({headers:req.headers, limits:{files:30, fileSize:4*1024*1024}}); }
+    try{ bb=Busboy({headers:req.headers, limits:{files:2, fileSize:3.0*1024*1024}}); }
     catch(e){ reject(e); return; }
     const files=[]; const fields={};
     bb.on('field',(n,v)=>{ if(!fields[n])fields[n]=[]; fields[n].push(v); });
@@ -24,7 +24,7 @@ function parseMultipart(req){
 
 function contentForFiles(uploaded){
   return uploaded.flatMap(f=>[
-    {type:'input_text',text:`\n--- FILE: ${f.filename} | ROLE HINT: ${f.role==='auto'?'AIで判定':f.role} ---\n`},
+    {type:'input_text',text:`\n--- FILE: ${f.filename} | ROLE HINT: ${f.role==='auto'?'AIで判定':f.role} ${/__P\d{3}\.txt$/i.test(f.filename)?' | PPTX_SLIDE_COMPANION: このTXTは直前/同一リクエストの同名PPTXスライド画像の構造メタデータです。単独の資料としてlayoutMapを作らず、画像解析の補助情報として使う':''} ---\n`},
     isImage(f.mimeType,f.filename)
       ? {type:'input_image',file_id:f.fileId,detail:'high'}
       : {type:'input_file',file_id:f.fileId}
@@ -63,7 +63,7 @@ export default async function handler(req,res){
     const {fields,files}=await parseMultipart(req);
     const roles=fields.roles||[];
     const usable=files.filter(f=>isSupported(f.filename,f.mimeType));
-    const oversized=usable.filter(f=>f.tooLarge || f.buffer.length>4*1024*1024);
+    const oversized=usable.filter(f=>f.tooLarge || f.buffer.length>3.0*1024*1024);
     if(oversized.length){
       return res.status(413).json({error:`ファイルサイズが大きすぎます: ${oversized.map(f=>f.filename).join(', ')}。ブラウザ側で大容量PDFはページ画像へ変換して分割送信する仕様です。送信途中で制限に達した場合は、ファイル形式またはサイズを確認してください。`});
     }

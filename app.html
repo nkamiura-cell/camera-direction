@@ -2128,6 +2128,77 @@ async function compressLargeImage(file){
   return canvasToSmallJpeg(canvas,file.name.replace(/\.[^.]+$/,'')+'.jpg',1);
 }
 
+async function getJSZip(){
+  if(window.__kobanJSZip)return window.__kobanJSZip;
+  const mod=await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');
+  window.__kobanJSZip=mod.default||mod;
+  return window.__kobanJSZip;
+}
+function xmlDoc(text){return new DOMParser().parseFromString(text,'application/xml');}
+function numAttr(el,n,d=0){const v=Number(el?.getAttribute(n));return Number.isFinite(v)?v:d;}
+function firstLocal(root,local){return [...root.getElementsByTagName('*')].find(e=>e.localName===local)||null;}
+function allLocal(root,local){return [...root.getElementsByTagName('*')].filter(e=>e.localName===local);}
+function emuBox(el){
+  const xfrm=el?.getElementsByTagName('*');
+  const off=[...xfrm].find(e=>e.localName==='off'),ext=[...xfrm].find(e=>e.localName==='ext');
+  return {x:numAttr(off,'x'),y:numAttr(off,'y'),cx:numAttr(ext,'cx'),cy:numAttr(ext,'cy')};
+}
+function relId(el){return el?.getAttribute('r:embed')||el?.getAttribute('embed')||el?.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','embed')||'';}
+function slideText(shape){
+  return allLocal(shape,'t').map(e=>e.textContent||'').join('').trim();
+}
+function wrapCanvasText(ctx,text,x,y,maxW,lineH,font){
+  ctx.font=font;ctx.fillStyle='#1d241f';ctx.textBaseline='top';
+  const chars=[...text];let line='',yy=y;
+  for(const ch of chars){const test=line+ch;if(ctx.measureText(test).width>maxW&&line){ctx.fillText(line,x,yy);line=ch;yy+=lineH;}else line=test;}
+  if(line)ctx.fillText(line,x,yy);
+}
+async function blobToDataUrl(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob);});}
+async function loadImageFromBlob(blob){
+  const url=URL.createObjectURL(blob);
+  try{return await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{URL.revokeObjectURL(url);resolve(im)};im.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('画像読み込みに失敗しました'))};im.src=url;});}
+  catch(e){URL.revokeObjectURL(url);throw e;}
+}
+async function pptxSlideProxies(file){
+  const JSZip=await getJSZip();
+  const zip=await JSZip.loadAsync(await file.arrayBuffer());
+  const presEntry=zip.file('ppt/presentation.xml');
+  let slideCx=12192000,slideCy=6858000;
+  if(presEntry){const pd=xmlDoc(await presEntry.async('text'));const sld=firstLocal(pd,'sldSz');if(sld){slideCx=numAttr(sld,'cx',slideCx);slideCy=numAttr(sld,'cy',slideCy);}}
+  const slideNames=Object.keys(zip.files).filter(n=>/^ppt\/slides\/slide\d+\.xml$/.test(n)).sort((a,b)=>Number(a.match(/\d+/)[0])-Number(b.match(/\d+/)[0]));
+  const out=[];
+  for(let si=0;si<slideNames.length;si++){
+    const slidePath=slideNames[si], slideNum=si+1;
+    const sd=xmlDoc(await zip.file(slidePath).async('text'));
+    const relPath=slidePath.replace('ppt/slides/','ppt/slides/_rels/')+'.rels';
+    const relMap={};
+    if(zip.file(relPath)){
+      const rd=xmlDoc(await zip.file(relPath).async('text'));
+      allLocal(rd,'Relationship').forEach(r=>{relMap[r.getAttribute('Id')]=r.getAttribute('Target')||'';});
+    }
+    const canvas=document.createElement('canvas');canvas.width=1600;canvas.height=Math.round(1600*slideCy/slideCx);
+    const ctx=canvas.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+    const scaleX=canvas.width/slideCx,scaleY=canvas.height/slideCy;
+    const items=[];
+    const pics=allLocal(sd,'pic');
+    for(const pic of pics){
+      const b=emuBox(pic), blip=firstLocal(pic,'blip'), rid=relId(blip);let target=relMap[rid]||'';
+      if(target.startsWith('../'))target='ppt/'+target.replace(/^\.\.\//,''); else if(!target.startsWith('ppt/'))target='ppt/slides/'+target.replace(/^\//,'');
+      target=target.replace(/\\/g,'/');
+      const entry=zip.file(target); if(!entry)continue;
+      const blob=await entry.async('blob');
+      try{const im=await loadImageFromBlob(blob);const x=b.x*scaleX,y=b.y*scaleY,w=b.cx*scaleX,h=b.cy*scaleY;ctx.drawImage(im,x,y,w,h);items.push({kind:'image',target,box:{x:b.x/slideCx,y:b.y/slideCy,width:b.cx/slideCx,height:b.cy/slideCy}});}catch(_){items.push({kind:'image',target,box:{x:b.x/slideCx,y:b.y/slideCy,width:b.cx/slideCx,height:b.cy/slideCy}});}
+    }
+    const shapes=allLocal(sd,'sp');
+    for(const sp of shapes){const text=slideText(sp);if(!text)continue;const b=emuBox(sp);const x=b.x*scaleX,y=b.y*scaleY,w=b.cx*scaleX;wrapCanvasText(ctx,text,x,y,Math.max(40,w-10),24,'18px Arial');items.push({kind:'text',text,box:{x:b.x/slideCx,y:b.y/slideCy,width:b.cx/slideCx,height:b.cy/slideCy}});}
+    const manifest=[`PPTX_SLIDE ${slideNum}/${slideNames.length}`,`SOURCE: ${file.name}`,`SLIDE_SIZE_EMU: ${slideCx} x ${slideCy}`,`This slide is rendered in the browser from PPTX embedded images and text. Use the visual proxy plus the structured items below for layout analysis.`,`ITEMS:`].concat(items.map((it,i)=>it.kind==='image'?`- IMAGE ${i+1}: ${it.target} bbox=${JSON.stringify(it.box)}`:`- TEXT ${i+1}: ${JSON.stringify(it.text)} bbox=${JSON.stringify(it.box)}`)).join('\n');
+    const jpg=await canvasToSmallJpeg(canvas,`${file.name.replace(/\.[^.]+$/,'')}__P${String(slideNum).padStart(3,'0')}.jpg`);
+    const txt=new File([manifest],`${file.name.replace(/\.[^.]+$/,'')}__P${String(slideNum).padStart(3,'0')}.txt`,{type:'text/plain'});
+    preparedMaterialPreviews[jpg.name]=URL.createObjectURL(jpg);
+    out.push({file:jpg,name:jpg.name,role:'auto',size:jpg.size,type:jpg.type,sourceName:file.name,pageNumber:slideNum,companionText:txt});
+  }
+  return out;
+}
 async function prepareMaterialItems(all,onProgress){
   const prepared=[];
   for(let i=0;i<all.length;i++){
@@ -2137,6 +2208,9 @@ async function prepareMaterialItems(all,onProgress){
     if(lower.endsWith('.pdf') && x.size>MAX_DIRECT_FILE_BYTES){
       const pages=await rasterizeLargePdf(x.file);
       prepared.push(...pages);
+    }else if(lower.endsWith('.pptx') && x.size>MAX_DIRECT_FILE_BYTES){
+      const slides=await pptxSlideProxies(x.file);
+      prepared.push(...slides);
     }else if(/^image\//.test(x.type||'') && x.size>MAX_DIRECT_FILE_BYTES){
       const f=await compressLargeImage(x.file);
       prepared.push({file:f,name:f.name,role:'auto',size:f.size,type:f.type,sourceName:x.name});
@@ -2165,7 +2239,9 @@ async function analyzeMaterialBatch(batch,endpoint,batchIndex,total,onProgress){
     const x=batch[bi];
     const form=new FormData();
     form.append('files',x.file,x.name);
+    if(x.companionText) form.append('files',x.companionText,x.companionText.name);
     form.append('roles','auto');
+    if(x.companionText) form.append('roles','auto');
     onProgress?.(`AI解析中… ${batchIndex} / ${total}・${bi+1} / ${batch.length}`);
     const res=await fetch(endpoint,{method:'POST',body:form});
     const raw=await res.text();
