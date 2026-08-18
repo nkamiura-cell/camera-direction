@@ -435,6 +435,8 @@ body.print-a3{--print-size:a3}
 
 .material-dropzone{position:relative;cursor:pointer}.material-dropzone input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.material-dropzone.dragover{border-color:var(--accent);background:#f5f8f5}.uploaded-list{display:grid;gap:5px;margin-top:7px}.uploaded-item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:6px;padding:7px 8px;background:#fff}.uploaded-item .fileicon{width:30px;flex:none}.uploaded-item .filemeta{min-width:0;flex:1}.uploaded-item .filename{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.uploaded-item .filesub{font-size:7px;color:var(--muted);margin-top:2px}.uploaded-item .file-role{font-size:6px;padding:3px 5px;border-radius:99px;background:#f0f2ef}.uploaded-item button{border:0;background:none;color:#899089;font-size:13px;cursor:pointer}.upload-summary{font-size:7px;color:var(--muted);margin-top:6px}.region-ai-overlay{position:absolute;border:2px solid #718c74;background:rgba(113,140,116,.13);box-sizing:border-box;cursor:pointer}.region-ai-overlay span{position:absolute;left:4px;top:4px;background:#fff;padding:3px 5px;border-radius:3px;font-size:7px;font-weight:800}.region-confidence{font-size:6px;color:var(--muted);margin-top:2px}
 
+
+.layout-page-overlay{position:absolute;border:1.5px dashed #718c74;box-sizing:border-box;background:rgba(113,140,116,.035);cursor:pointer;z-index:2}.layout-page-overlay.active{border:2px solid #334f38;background:rgba(113,140,116,.08)}.layout-page-label{position:absolute;left:4px;top:4px;background:#fff;border:1px solid #d7ddd7;border-radius:4px;padding:2px 5px;font-size:7px;font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.08)}.layout-region-overlay{position:absolute;border:2px solid #718c74;background:rgba(113,140,116,.14);box-sizing:border-box;cursor:pointer;z-index:3}.layout-region-overlay span{position:absolute;left:3px;top:3px;background:#fff;padding:2px 4px;border-radius:3px;font-size:6px;font-weight:800}.layout-source-note{font-size:7px;color:var(--muted);margin-top:5px}.layout-page-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}.layout-page-chip{border:1px solid var(--line);background:#fff;border-radius:5px;padding:5px 7px;font-size:7px;cursor:pointer}.layout-page-chip.active{background:#eef4ee;border-color:#718c74;font-weight:800}
 </style>
 
 <script>
@@ -519,7 +521,7 @@ body.print-a3{--print-size:a3}
             <div class="field"><span class="field-label">採用ターゲット</span><input value=""></div>
             <div class="field"><span class="field-label">撮影可能時間</span><input value=""></div>
           </div>
-          <div class="dropzone material-dropzone" id="overviewDropzone" style="margin-top:10px"><input type="file" id="overviewFiles" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.md,.jpg,.jpeg,.png,.webp"><b>概要資料をここに追加</b><small>PDF / PPTX / DOCX / TXT / 画像など。複数ファイル可</small></div><div id="overviewUploaded" class="uploaded-list"></div>
+          <div class="dropzone material-dropzone" id="projectDropzone" style="margin-top:10px"><input type="file" id="projectFiles" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.md,.jpg,.jpeg,.png,.webp"><b>案件資料をまとめて追加</b><small>PDF / PPTX / DOCX / TXT / 画像など。概要・台割・デザインを分けず、そのまま複数ファイル追加できます。</small></div><div id="projectUploaded" class="uploaded-list"></div>
           <div class="filelist"></div></div><button class="remove">×</button></div>
             <div class="fileitem"><div class="fileicon">TXT</div><div class="filemeta"><div class="filename"></div><div class="filesub">補足情報・注意事項</div></div><button class="remove">×</button></div>
           </div>
@@ -529,18 +531,15 @@ body.print-a3{--print-size:a3}
       <div class="card material-card">
         <div class="card-head"><strong>制作物・クリエイティブ</strong><span>撮影設計にクリティカルな情報</span><span style="margin-left:auto" class="badge-critical">重要</span></div>
         <div class="card-body">
-          <div class="material-list"></div></div><span class="badge-critical">台割</span></div>
-            <div class="material-item critical"><div class="fileicon">FIG</div><div class="filemeta"><div class="filename">_デザインラフ.fig</div><div class="filesub">任意：Figmaから構造を取得</div></div><span class="badge-critical">Figma</span></div>
-            <div class="material-item critical"><div class="fileicon">PDF</div><div class="filemeta"><div class="filename"></div><div class="filesub">写真トーン・デザイン方向性</div></div><span class="badge-critical">コンセプト</span></div>
-          </div>
-          <div class="dropzone material-dropzone" id="layoutDropzone" style="margin-top:10px"><input type="file" id="layoutFiles" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.md,.jpg,.jpeg,.png,.webp"><b>台割・ワイヤー・デザインを追加</b><small>Figmaはオプション。PDF / PPTX / 画像でも利用できます。</small></div><div id="layoutUploaded" class="uploaded-list"></div><div class="upload-summary">台割PDFやデザイン画像をそのまま共有できます。Figmaは引き続きオプションです。</div>
+          <div class="material-list"></div></div><span class="badge-critical">AIが資料種別を判定</span></div>
+          <div class="upload-summary" style="margin-top:8px">アップロード後、AIが資料を「案件前提」「台割・デザイン」「参考資料」などに自動分類します。台割・デザイン資料は、別系統で優先的に解析します。</div>
         </div>
       </div>
     </div>
 
     <div>
       <div class="card">
-        <div class="cut-auto-visual" style="margin-bottom:8px"><div><div class="label">共有資料をAIに読み込ませる</div><div class="sub">案件概要・台割・デザインをまとめて解析</div></div><div class="spacer"></div><button id="readMaterialsBtn" class="small-btn" onclick="readProjectMaterials()">AIに読み込ませる</button></div><div class="card-head"><strong>AIが理解した案件の前提</strong></div>
+        <div class="cut-auto-visual" style="margin-bottom:8px"><div><div class="label">共有資料をAIに読み込ませる</div><div class="sub">案件資料をまとめて解析。資料種別はAIが自動判定し、台割・デザインは専用解析します</div></div><div class="spacer"></div><button id="readMaterialsBtn" class="small-btn" onclick="readProjectMaterials()">AIに読み込ませる</button></div><div class="card-head"><strong>AIが理解した案件の前提</strong></div>
         <div class="card-body">
           <div class="ai-understanding ai-result">
             <div class="summary-row"><div class="summary-label">案件</div><div class="summary-value"><input class="ai-editable" value="" aria-label="案件"></div></div>
@@ -575,10 +574,10 @@ body.print-a3{--print-size:a3}
   </div>
   <div class="prep-grid" style="grid-template-columns:minmax(0,1.5fr) minmax(280px,.5fr)">
     <div class="card">
-      <div class="card-head"><strong>台割プレビュー</strong><span>P1 / </span></div>
+      <div class="card-head"><strong>台割プレビュー</strong><span id="layoutMapMeta">AI解析後にページ構造を表示</span></div>
       <div class="card-body">
         <div class="board">
-          <div class="board-page" id="boardPage"></div></div></div>
+          <div class="board-page" id="boardPage"></div><div id="layoutPageList" class="layout-page-list"></div><div id="layoutSourceNote" class="layout-source-note"></div></div></div>
       </div>
     </div>
 
@@ -2056,17 +2055,201 @@ async function structureActiveCut(){
 }
 
 
-const projectUploads={overview:[],layout:[]};
+const projectUploads={all:[]};
+let layoutMapsState=[];
+let activeLayoutMapIndex=0;
+let activeLayoutPage=1;
+let activeLayoutFileUrl='';
+const preparedMaterialPreviews={};
+const MAX_MATERIAL_BATCH_BYTES=3.2*1024*1024;
+const MAX_DIRECT_FILE_BYTES=3.2*1024*1024;
 function fileKind(name){const e=(name.split('.').pop()||'').toLowerCase();if(e==='pdf')return'PDF';if(['ppt','pptx'].includes(e))return'PPT';if(['doc','docx'].includes(e))return'DOC';if(['jpg','jpeg','png','webp'].includes(e))return'IMG';return'TXT';}
-function renderUploaded(type){const root=document.getElementById(type==='overview'?'overviewUploaded':'layoutUploaded');if(!root)return;root.innerHTML=projectUploads[type].map((f,i)=>`<div class="uploaded-item"><div class="fileicon">${fileKind(f.name)}</div><div class="filemeta"><div class="filename">${escapeHtml(f.name)}</div><div class="filesub">${Math.max(1,Math.round(f.size/1024))} KB</div></div><span class="file-role">${type==='layout'?'クリティカル':'前提'}</span><button onclick="removeProjectFile('${type}',${i});return false">×</button></div>`).join('');}
-function addProjectFiles(type,files){[...files].forEach(file=>projectUploads[type].push({file,name:file.name,size:file.size,type:file.type}));renderUploaded(type);}
-function removeProjectFile(type,i){projectUploads[type].splice(i,1);renderUploaded(type);}
-function setupProjectUpload(type){const input=document.getElementById(type==='overview'?'overviewFiles':'layoutFiles'),zone=document.getElementById(type==='overview'?'overviewDropzone':'layoutDropzone');if(!input||!zone)return;input.addEventListener('change',e=>addProjectFiles(type,e.target.files));['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add('dragover')}));['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove('dragover')}));zone.addEventListener('drop',e=>addProjectFiles(type,e.dataTransfer.files));}
-setupProjectUpload('overview');setupProjectUpload('layout');
-async function readProjectMaterials(){const btn=document.getElementById('readMaterialsBtn'),all=[...projectUploads.overview.map(x=>({...x,role:'overview'})),...projectUploads.layout.map(x=>({...x,role:'layout'}))];if(!all.length){btn.textContent='資料を追加してください';setTimeout(()=>btn.textContent='AIに読み込ませる',1800);return;}const s=getProviderSettings(),endpoint=(s.endpoint||'/api/cut-images').replace(/\/api\/cut-images\/?$/,'/api/project-materials');btn.textContent='解析中…';btn.disabled=true;try{const form=new FormData();all.forEach(x=>{form.append('files',x.file,x.name);form.append('roles',x.role)});const res=await fetch(endpoint,{method:'POST',body:form});const data=await res.json();if(!res.ok)throw new Error(data.error||'解析に失敗');applyProjectSummary(data.summary||{});if(Array.isArray(data.regions)&&data.regions.length)renderAIRegions(data.regions);btn.textContent='解析完了';}catch(e){console.error(e);btn.textContent='解析エラー';alert(e.message||'資料解析に失敗しました');}finally{btn.disabled=false;setTimeout(()=>btn.textContent='AIに読み込ませる',2200);}}
+function roleLabel(role){return role==='layout'?'台割・デザイン':role==='overview'?'案件前提':role==='reference'?'参考資料':'AI判定待ち';}
+function renderUploaded(){const root=document.getElementById('projectUploaded');if(!root)return;root.innerHTML=projectUploads.all.map((f,i)=>`<div class="uploaded-item"><div class="fileicon">${fileKind(f.name)}</div><div class="filemeta"><div class="filename">${escapeHtml(f.name)}</div><div class="filesub">${Math.max(1,Math.round(f.size/1024))} KB</div></div><span class="file-role">${roleLabel(f.role)}</span><button onclick="removeProjectFile(${i});return false">×</button></div>`).join('');}
+function addProjectFiles(files){[...files].forEach(file=>projectUploads.all.push({file,name:file.name,size:file.size,type:file.type,role:'auto'}));renderUploaded();}
+function removeProjectFile(i){projectUploads.all.splice(i,1);renderUploaded();}
+function setupProjectUpload(){const input=document.getElementById('projectFiles'),zone=document.getElementById('projectDropzone');if(!input||!zone)return;input.addEventListener('change',e=>addProjectFiles(e.target.files));['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add('dragover')}));['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove('dragover')}));zone.addEventListener('drop',e=>addProjectFiles(e.dataTransfer.files));}
+setupProjectUpload();
+
+async function getPdfJs(){
+  if(window.__kobanPdfJs)return window.__kobanPdfJs;
+  const mod=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
+  mod.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
+  window.__kobanPdfJs=mod;
+  return mod;
+}
+
+async function canvasToSmallJpeg(canvas,name,baseScale=1){
+  let scale=baseScale, quality=.70, blob=null;
+  for(let attempt=0;attempt<5;attempt++){
+    const c=document.createElement('canvas');
+    const maxDim=1800;
+    const ratio=Math.min(1,maxDim/Math.max(canvas.width,canvas.height));
+    c.width=Math.max(1,Math.round(canvas.width*ratio));
+    c.height=Math.max(1,Math.round(canvas.height*ratio));
+    const ctx=c.getContext('2d',{alpha:false});
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(canvas,0,0,c.width,c.height);
+    blob=await new Promise(resolve=>c.toBlob(resolve,'image/jpeg',quality));
+    if(blob && blob.size<=MAX_MATERIAL_BATCH_BYTES*.72) return new File([blob],name,{type:'image/jpeg'});
+    quality-=.08;
+    if(quality<.42){scale*=.82;quality=.68;}
+  }
+  return new File([blob],name,{type:'image/jpeg'});
+}
+
+async function rasterizeLargePdf(file){
+  const pdfjs=await getPdfJs();
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  const pdf=await pdfjs.getDocument({data:bytes}).promise;
+  const out=[];
+  for(let i=1;i<=pdf.numPages;i++){
+    const page=await pdf.getPage(i);
+    const viewport=page.getViewport({scale:1.35});
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+    const ctx=canvas.getContext('2d',{alpha:false});
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+    await page.render({canvasContext:ctx,viewport}).promise;
+    const name=`${file.name.replace(/\.[^.]+$/,'')}__P${String(i).padStart(3,'0')}.jpg`;
+    const imageFile=await canvasToSmallJpeg(canvas,name,1);
+    preparedMaterialPreviews[name]=URL.createObjectURL(imageFile);
+    out.push({file:imageFile,name,role:'auto',size:imageFile.size,type:'image/jpeg',sourceName:file.name,pageNumber:i});
+  }
+  return out;
+}
+
+async function compressLargeImage(file){
+  const img=await new Promise((resolve,reject)=>{const u=URL.createObjectURL(file);const im=new Image();im.onload=()=>{URL.revokeObjectURL(u);resolve(im)};im.onerror=reject;im.src=u;});
+  const maxDim=2000, ratio=Math.min(1,maxDim/Math.max(img.naturalWidth,img.naturalHeight));
+  const canvas=document.createElement('canvas');canvas.width=Math.round(img.naturalWidth*ratio);canvas.height=Math.round(img.naturalHeight*ratio);
+  const ctx=canvas.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  return canvasToSmallJpeg(canvas,file.name.replace(/\.[^.]+$/,'')+'.jpg',1);
+}
+
+async function prepareMaterialItems(all,onProgress){
+  const prepared=[];
+  for(let i=0;i<all.length;i++){
+    const x=all[i];
+    onProgress?.(`資料を準備中… ${i+1} / ${all.length}`);
+    const lower=(x.name||'').toLowerCase();
+    if(lower.endsWith('.pdf') && x.size>MAX_DIRECT_FILE_BYTES){
+      const pages=await rasterizeLargePdf(x.file);
+      prepared.push(...pages);
+    }else if(/^image\//.test(x.type||'') && x.size>MAX_DIRECT_FILE_BYTES){
+      const f=await compressLargeImage(x.file);
+      prepared.push({file:f,name:f.name,role:'auto',size:f.size,type:f.type,sourceName:x.name});
+      preparedMaterialPreviews[f.name]=URL.createObjectURL(f);
+    }else{
+      prepared.push({...x});
+    }
+  }
+  return prepared;
+}
+
+function makeMaterialBatches(items){
+  const batches=[];let batch=[],bytes=0;
+  for(const item of items){
+    const size=item.size||item.file?.size||0;
+    if(batch.length && bytes+size>MAX_MATERIAL_BATCH_BYTES){batches.push(batch);batch=[];bytes=0;}
+    batch.push(item);bytes+=size;
+  }
+  if(batch.length)batches.push(batch);
+  return batches;
+}
+
+async function analyzeMaterialBatch(batch,endpoint,batchIndex,total,onProgress){
+  const form=new FormData();
+  batch.forEach(x=>{form.append('files',x.file,x.name);form.append('roles','auto');});
+  onProgress?.(`AI解析中… ${batchIndex} / ${total}`);
+  const res=await fetch(endpoint,{method:'POST',body:form});
+  const raw=await res.text();
+  let data;try{data=JSON.parse(raw);}catch(_){
+    if(raw.includes('Request Entity Too Large')||res.status===413) throw new Error('資料の送信サイズ制限に達しました。ファイルを自動分割・圧縮できない形式の可能性があります。');
+    throw new Error(raw.slice(0,240)||'AI解析サーバーからJSON以外の応答が返りました');
+  }
+  if(!res.ok)throw new Error(data.error||'解析に失敗');
+  return data;
+}
+
+function mergeMaterialResults(results){
+  const merged={summary:{},fileRoles:[],layoutMaps:[],regions:[],notes:[]};
+  for(const d of results){
+    if(d.summary) for(const [k,v] of Object.entries(d.summary)){if(v && !merged.summary[k])merged.summary[k]=v;}
+    if(Array.isArray(d.fileRoles))merged.fileRoles.push(...d.fileRoles);
+    if(Array.isArray(d.layoutMaps))merged.layoutMaps.push(...d.layoutMaps);
+    if(Array.isArray(d.regions))merged.regions.push(...d.regions);
+    if(d.notes)merged.notes.push(d.notes);
+  }
+  merged.notes=merged.notes.join('\n');
+  // When a large PDF was rasterized, restore the original document name in the UI while preserving page identity.
+  merged.layoutMaps.forEach(lm=>{
+    const m=lm.filename?.match(/^(.*)__P\d{3}\.jpg$/);
+    if(m)lm.sourceName=m[1];
+  });
+  return merged;
+}
+
+async function readProjectMaterials(){
+  const btn=document.getElementById('readMaterialsBtn'),all=projectUploads.all;
+  if(!all.length){btn.textContent='資料を追加してください';setTimeout(()=>btn.textContent='AIに読み込ませる',1800);return;}
+  const s=getProviderSettings(),endpoint=(s.endpoint||'/api/cut-images').replace(/\/api\/cut-images\/?$/,'/api/project-materials');
+  btn.textContent='資料を準備中…';btn.disabled=true;
+  try{
+    const prepared=await prepareMaterialItems(all,msg=>{btn.textContent=msg;});
+    const batches=makeMaterialBatches(prepared);
+    const results=[];
+    for(let i=0;i<batches.length;i++)results.push(await analyzeMaterialBatch(batches[i],endpoint,i+1,batches.length,msg=>{btn.textContent=msg;}));
+    const data=mergeMaterialResults(results);
+    (data.fileRoles||[]).forEach(r=>{
+      const original=r.filename?.replace(/__P\d{3}\.jpg$/,'');
+      const f=all.find(x=>x.name===r.filename||x.name===original)||prepared.find(x=>x.name===r.filename);
+      if(f && !f.role)f.role=r.role||'reference';
+      else if(f)f.role=r.role||'reference';
+    });
+    renderUploaded();
+    applyProjectSummary(data.summary||{});
+    if(Array.isArray(data.layoutMaps)&&data.layoutMaps.length)renderAIRegions(data.regions||[],data.layoutMaps);
+    else if(Array.isArray(data.regions)&&data.regions.length)renderAIRegions(data.regions,[]);
+    btn.textContent='解析完了';
+  }catch(e){console.error(e);btn.textContent='解析エラー';alert(e.message||'資料解析に失敗しました');}
+  finally{btn.disabled=false;setTimeout(()=>btn.textContent='AIに読み込ませる',2200);}
+}
 function applyProjectSummary(x){const inputs=[...document.querySelectorAll('.ai-understanding .summary-value input,.ai-understanding .summary-value textarea')];const vals=[x.project||'',x.work||'',x.target||'',x.photoTone||'',x.constraints||''];let j=0;inputs.forEach(el=>{if(vals[j])el.value=vals[j];j++;});}
-function renderAIRegions(regions){const board=document.getElementById('boardPage');if(!board)return;board.querySelectorAll('.region-ai-overlay').forEach(x=>x.remove());const pw=board.clientWidth,ph=board.clientHeight;regions.filter(r=>r.type!=='diagram').forEach((r,i)=>{const el=document.createElement('div');el.className='region-ai-overlay';el.dataset.type=r.type;el.style.left=(r.x*pw)+'px';el.style.top=(r.y*ph)+'px';el.style.width=(r.width*pw)+'px';el.style.height=(r.height*ph)+'px';el.innerHTML='<span>'+escapeHtml((r.type==='photo'?'PHOTO':r.type==='video'?'VIDEO':'図版')+' '+(i+1))+'</span>';el.title=(r.name||'AI検出領域')+' / 信頼度 '+Math.round((r.confidence||0)*100)+'%';el.onclick=()=>selectRegion(el,r.type,r.name||'AI検出領域');board.appendChild(el);});document.getElementById('regionCount').textContent=`AI検出 ${regions.length}領域`}
-async function analyzeLayoutRegions(){if(!projectUploads.layout.length){alert('先に台割・ワイヤー・デザインを追加してください。');return;}await readProjectMaterials();}
+function renderAIRegions(regions, layoutMaps=[]){
+  const board=document.getElementById('boardPage'); if(!board)return;
+  layoutMapsState=Array.isArray(layoutMaps)?layoutMaps:[];
+  activeLayoutMapIndex=Math.max(0,Math.min(activeLayoutMapIndex,Math.max(0,layoutMapsState.length-1)));
+  const lm=layoutMapsState[activeLayoutMapIndex];
+  if(lm && lm.pages && lm.pages.length) activeLayoutPage=lm.pages.some(p=>p.page===activeLayoutPage)?activeLayoutPage:lm.pages[0].page;
+  board.querySelectorAll('.layout-page-overlay,.layout-region-overlay,.region-ai-overlay').forEach(x=>x.remove());
+  board.style.backgroundImage='';board.style.backgroundSize='100% 100%';board.style.backgroundRepeat='no-repeat';board.style.backgroundPosition='center';
+  board.style.width='760px';board.style.height='520px';board.style.minHeight='520px';
+  const sourceName=lm?.filename||'';
+  const srcFile=projectUploads.all.find(f=>f.name===sourceName)||projectUploads.all.find(f=>sourceName.startsWith(f.name.replace(/\.[^.]+$/,'')));
+  const previewUrl=preparedMaterialPreviews[sourceName];
+  if(srcFile?.file && /^image\//.test(srcFile.type||'')){
+    if(activeLayoutFileUrl)URL.revokeObjectURL(activeLayoutFileUrl);activeLayoutFileUrl=URL.createObjectURL(srcFile.file);setBoardImage(activeLayoutFileUrl);
+  }else if(previewUrl){
+    if(activeLayoutFileUrl)URL.revokeObjectURL(activeLayoutFileUrl);activeLayoutFileUrl=previewUrl;setBoardImage(previewUrl);
+  }
+  renderLayoutOverlays();
+  const meta=document.getElementById('layoutMapMeta'),note=document.getElementById('layoutSourceNote'),list=document.getElementById('layoutPageList');
+  if(meta)meta.textContent=lm?`${lm.sourceName||lm.filename||'台割'} / ${lm.pageCount||lm.pages?.length||0}P / ${lm.layoutKind||'解析済み'}`:'AI解析後にページ構造を表示';
+  if(note)note.textContent=lm?`ページ構造：${lm.layoutKind||'unknown'}。AIが画像内のページ境界・見開き関係・素材領域を推定しています。`:' ';
+  if(list)list.innerHTML=layoutMapsState.flatMap((m,mi)=>(m.pages||[]).map(pg=>`<button class="layout-page-chip ${mi===activeLayoutMapIndex&&pg.page===activeLayoutPage?'active':''}" onclick="selectLayoutPage(${mi},${pg.page})">${escapeHtml(pg.label||('P'+pg.page))}</button>`)).join('');
+  const count=document.getElementById('regionCount');if(count)count.textContent=`AI検出 ${regions?.length||0}領域 / ページ ${layoutMapsState.reduce((n,m)=>n+(m.pages||[]).length,0)}`;
+}
+function setBoardImage(url){const board=document.getElementById('boardPage');if(!board)return;const img=new Image();img.onload=()=>{const ratio=img.naturalWidth/img.naturalHeight||1;board.style.height=Math.max(420,Math.round(760/ratio))+'px';board.style.backgroundImage=`url("${url}")`;renderLayoutOverlays();};img.src=url;}
+function renderLayoutOverlays(){
+  const board=document.getElementById('boardPage');if(!board)return;board.querySelectorAll('.layout-page-overlay,.layout-region-overlay,.region-ai-overlay').forEach(x=>x.remove());
+  const lm=layoutMapsState[activeLayoutMapIndex];if(!lm||!Array.isArray(lm.pages))return;const pw=board.clientWidth||760,ph=board.clientHeight||520;
+  (lm.pages||[]).forEach(pg=>{const b=pg.bbox||{x:0,y:0,width:1,height:1};const el=document.createElement('div');el.className='layout-page-overlay'+(pg.page===activeLayoutPage?' active':'');el.style.left=(b.x*pw)+'px';el.style.top=(b.y*ph)+'px';el.style.width=(b.width*pw)+'px';el.style.height=(b.height*ph)+'px';el.innerHTML=`<span class="layout-page-label">${escapeHtml(pg.label||('P'+pg.page))}${pg.relation==='spread-part'?' / 見開き':''}</span>`;el.onclick=ev=>{ev.stopPropagation();activeLayoutPage=pg.page;renderLayoutOverlays();renderLayoutPageList();};board.appendChild(el);});
+  const pg=(lm.pages||[]).find(x=>x.page===activeLayoutPage)||(lm.pages||[])[0];if(!pg)return;const b=pg.bbox||{x:0,y:0,width:1,height:1};
+  (pg.regions||[]).filter(r=>r.type!=='diagram').forEach((r,i)=>{const el=document.createElement('div');el.className='layout-region-overlay';el.style.left=((b.x+r.x*b.width)*pw)+'px';el.style.top=((b.y+r.y*b.height)*ph)+'px';el.style.width=(r.width*b.width*pw)+'px';el.style.height=(r.height*b.height*ph)+'px';el.innerHTML=`<span>${escapeHtml((r.type==='photo'?'PHOTO':r.type==='video'?'VIDEO':'図版')+' '+(i+1))}</span>`;el.title=(r.name||'AI検出領域')+' / '+Math.round((r.confidence||0)*100)+'%';el.onclick=ev=>{ev.stopPropagation();selectRegion(el,r.type,r.name||'AI検出領域');};board.appendChild(el);});
+}
+function renderLayoutPageList(){const list=document.getElementById('layoutPageList');if(!list)return;list.innerHTML=layoutMapsState.flatMap((m,mi)=>(m.pages||[]).map(pg=>`<button class="layout-page-chip ${mi===activeLayoutMapIndex&&pg.page===activeLayoutPage?'active':''}" onclick="selectLayoutPage(${mi},${pg.page})">${escapeHtml(pg.label||('P'+pg.page))}</button>`)).join('');const meta=document.getElementById('layoutMapMeta'),lm=layoutMapsState[activeLayoutMapIndex];if(meta&&lm)meta.textContent=`${lm.sourceName||lm.filename||'台割'} / ${lm.pageCount||lm.pages?.length||0}P / P${activeLayoutPage}`;}
+function selectLayoutPage(mi,page){activeLayoutMapIndex=mi;activeLayoutPage=page;renderLayoutOverlays();renderLayoutPageList();}
+async function analyzeLayoutRegions(){if(!projectUploads.all.length){alert('先に案件資料を追加してください。AIが台割・デザイン資料を自動判定して解析します。');return;}await readProjectMaterials();}
 
 async function fetchRealCutCandidates(query,mode){const s=getProviderSettings();const endpoint=s.endpoint||'/api/cut-images';const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,mode,cutId:activeCutRefId,projectContext:getProjectContextForCuts?getProjectContextForCuts():'',cutContext:getCutContext?getCutContext(activeCutRefId):'',cutIntent:activeCutIntent||{}})});if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||'画像候補APIに接続できませんでした');}return res.json();}
 

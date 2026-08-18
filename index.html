@@ -15,7 +15,7 @@ body{margin:0;background:#f5f5f2;color:#222;font-family:Arial,'Noto Sans JP',san
 </style></head><body><div class="wrap"><div class="top"><div><div class="ey">KOBAN / CAMERA DIRECTION</div><h1>案件一覧</h1><div style="font-size:10px;color:#999;margin-top:8px">案件名・企業名は一覧に表示されません</div></div><button class="new" onclick="showNew()">＋ 新規案件</button></div><div class="tabs"><button class="tab active" data-view="active" onclick="switchView('active')">案件一覧</button><button class="tab" data-view="archived" onclick="switchView('archived')">アーカイブ</button></div><div id="grid" class="grid"></div></div>
 <div id="modal" class="modal"><div class="box"><h2>新規案件</h2><label>案件情報</label><input id="pn" placeholder="案件を識別するための名称（一覧には表示されません）"><label>クライアント情報</label><input id="pc" placeholder="企業名（一覧には表示されません）"><div class="actions"><button class="cancel" onclick="hideNew()">キャンセル</button><button class="create" onclick="create()">案件を作成</button></div></div></div>
 <script>
-const K='koban_projects_v6',seed=[
+const K='koban_projects_v7',seed=[
   {id:'project-01',status:'未着手',archived:false},
   {id:'project-02',status:'未着手',archived:false}
 ];
