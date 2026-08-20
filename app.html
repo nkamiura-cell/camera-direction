@@ -2061,7 +2061,7 @@ let activeLayoutMapIndex=0;
 let activeLayoutPage=1;
 let activeLayoutFileUrl='';
 const preparedMaterialPreviews={};
-const MAX_MATERIAL_BATCH_BYTES=2.6*1024*1024;
+const MAX_MATERIAL_BATCH_BYTES=2.4*1024*1024;
 const MAX_DIRECT_FILE_BYTES=2.6*1024*1024;
 function fileKind(name){const e=(name.split('.').pop()||'').toLowerCase();if(e==='pdf')return'PDF';if(['ppt','pptx'].includes(e))return'PPT';if(['doc','docx'].includes(e))return'DOC';if(['jpg','jpeg','png','webp'].includes(e))return'IMG';return'TXT';}
 function roleLabel(role){return role==='layout'?'台割・デザイン':role==='overview'?'案件前提':role==='reference'?'参考資料':'AI判定待ち';}
@@ -2225,7 +2225,7 @@ async function prepareMaterialItems(all,onProgress){
 function makeMaterialBatches(items){
   const batches=[];let batch=[],bytes=0;
   for(const item of items){
-    const size=item.size||item.file?.size||0;
+    const size=(item.size||item.file?.size||0)+(item.companionText?.size||0);
     if(batch.length && bytes+size>MAX_MATERIAL_BATCH_BYTES){batches.push(batch);batch=[];bytes=0;}
     batch.push(item);bytes+=size;
   }
@@ -2233,39 +2233,76 @@ function makeMaterialBatches(items){
   return batches;
 }
 
-async function analyzeMaterialBatch(batch,endpoint,batchIndex,total,onProgress){
-  const results=[];
-  for(let bi=0;bi<batch.length;bi++){
-    const x=batch[bi];
-    const form=new FormData();
+async function startMaterialBatch(batch,endpoint,batchIndex,total,onProgress){
+  const form=new FormData();
+  for(const x of batch){
     form.append('files',x.file,x.name);
     if(x.companionText) form.append('files',x.companionText,x.companionText.name);
-    form.append('roles','auto');
-    if(x.companionText) form.append('roles','auto');
-    onProgress?.(`AI解析中… ${batchIndex} / ${total}・${bi+1} / ${batch.length}`);
-    const res=await fetch(endpoint,{method:'POST',body:form});
-    const raw=await res.text();
-    let data;try{data=JSON.parse(raw);}catch(_){
-      if(raw.includes('Request Entity Too Large')||res.status===413) throw new Error(`資料「${x.name}」の送信サイズ制限に達しました。自動圧縮後も大きすぎる可能性があります。`);
-      throw new Error(raw.slice(0,240)||'AI解析サーバーからJSON以外の応答が返りました');
-    }
-    if(!res.ok)throw new Error(data.error||`「${x.name}」の解析に失敗しました`);
-    results.push(data);
   }
-  return mergeMaterialResults(results);
+  onProgress?.(`AI解析ジョブを開始中… ${batchIndex} / ${total}`);
+  const res=await fetch(endpoint,{method:'POST',body:form});
+  const raw=await res.text();
+  let data;try{data=JSON.parse(raw);}catch(_){
+    if(raw.includes('Request Entity Too Large')||res.status===413) throw new Error(`資料の送信サイズ制限に達しました。自動圧縮後も大きすぎる可能性があります。`);
+    throw new Error(raw.slice(0,240)||'AI解析サーバーからJSON以外の応答が返りました');
+  }
+  if(!res.ok)throw new Error(data.error||'AI解析ジョブの開始に失敗しました');
+  return (data.jobs||[]).map(j=>({...j,batchIndex}));
+}
+
+async function pollMaterialJob(job,statusEndpoint,onProgress){
+  const started=Date.now();
+  while(true){
+    const res=await fetch(`${statusEndpoint}?id=${encodeURIComponent(job.jobId)}`);
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(data.error||`「${job.filename||'資料'}」の解析状態を取得できませんでした`);
+    if(['queued','in_progress'].includes(data.status)){
+      const sec=Math.floor((Date.now()-started)/1000);
+      onProgress?.(`${job.filename||'資料'}をAI解析中… ${data.status==='queued'?'待機中':'解析中'} ${sec}秒`);
+      await new Promise(r=>setTimeout(r,2200));
+      continue;
+    }
+    if(data.status!=='completed') throw new Error(`「${job.filename||'資料'}」のAI解析が${data.status||'失敗'}で終了しました`);
+    return {filename:job.filename,sourceName:job.sourceName,data:data.data||null,raw:data.output_text||''};
+  }
+}
+
+async function startSynthesisJob(results,endpoint,onProgress){
+  const payload=results.map(r=>({filename:r.filename,sourceName:r.sourceName,data:r.data||{}}));
+  onProgress?.('資料全体を統合中…');
+  const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({results:payload})});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(data.error||'案件資料の統合ジョブを開始できませんでした');
+  return data.jobId;
+}
+
+async function pollSynthesisJob(jobId,statusEndpoint,onProgress){
+  while(true){
+    const res=await fetch(`${statusEndpoint}?id=${encodeURIComponent(jobId)}`);
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(data.error||'統合結果の取得に失敗しました');
+    if(['queued','in_progress'].includes(data.status)){
+      onProgress?.(`案件資料を統合中… ${data.status==='queued'?'待機中':'解析中'}`);
+      await new Promise(r=>setTimeout(r,2200));
+      continue;
+    }
+    if(data.status!=='completed')throw new Error(`案件資料の統合が${data.status||'失敗'}で終了しました`);
+    return data.data||{};
+  }
 }
 
 function mergeMaterialResults(results){
   const merged={summary:{},fileRoles:[],layoutMaps:[],regions:[],notes:[]};
   for(const d of results){
-    if(d.summary) for(const [k,v] of Object.entries(d.summary)){if(v && !merged.summary[k])merged.summary[k]=v;}
-    if(Array.isArray(d.fileRoles))merged.fileRoles.push(...d.fileRoles);
-    if(Array.isArray(d.layoutMaps))merged.layoutMaps.push(...d.layoutMaps);
-    if(Array.isArray(d.regions))merged.regions.push(...d.regions);
-    if(d.notes)merged.notes.push(d.notes);
+    const data=d?.data||d||{};
+    if(data.summary) for(const [k,v] of Object.entries(data.summary)){if(v && !merged.summary[k])merged.summary[k]=v;}
+    if(Array.isArray(data.fileRoles))merged.fileRoles.push(...data.fileRoles);
+    else if(data.fileRole)merged.fileRoles.push(data.fileRole);
+    if(Array.isArray(data.layoutMaps))merged.layoutMaps.push(...data.layoutMaps);
+    if(Array.isArray(data.regions))merged.regions.push(...data.regions);
+    if(data.notes)merged.notes.push(data.notes);
   }
   merged.notes=merged.notes.join('\n');
-  // When a large PDF was rasterized, restore the original document name in the UI while preserving page identity.
   merged.layoutMaps.forEach(lm=>{
     const m=lm.filename?.match(/^(.*)__P\d{3}\.jpg$/);
     if(m)lm.sourceName=m[1];
@@ -2276,19 +2313,37 @@ function mergeMaterialResults(results){
 async function readProjectMaterials(){
   const btn=document.getElementById('readMaterialsBtn'),all=projectUploads.all;
   if(!all.length){btn.textContent='資料を追加してください';setTimeout(()=>btn.textContent='AIに読み込ませる',1800);return;}
-  const s=getProviderSettings(),endpoint=(s.endpoint||'/api/cut-images').replace(/\/api\/cut-images\/?$/,'/api/project-materials');
+  const base=(getProviderSettings().endpoint||'/api/cut-images').replace(/\/api\/cut-images\/?$/,'');
+  const endpoint=`${base}/api/project-materials`;
+  const statusEndpoint=`${base}/api/project-materials-status`;
+  const synthesisEndpoint=`${base}/api/project-materials-synthesis`;
   btn.textContent='資料を準備中…';btn.disabled=true;
   try{
     const prepared=await prepareMaterialItems(all,msg=>{btn.textContent=msg;});
     const batches=makeMaterialBatches(prepared);
-    const results=[];
-    for(let i=0;i<batches.length;i++)results.push(await analyzeMaterialBatch(batches[i],endpoint,i+1,batches.length,msg=>{btn.textContent=msg;}));
-    const data=mergeMaterialResults(results);
+    // 大きな資料は複数の小さなジョブに分けるが、ジョブ自体はOpenAI background modeで並列実行する。
+    const jobGroups=await Promise.all(batches.map((b,i)=>startMaterialBatch(b,endpoint,i+1,batches.length,msg=>{btn.textContent=msg;})));
+    const jobs=jobGroups.flat();
+    btn.textContent=`AI解析中… 0 / ${jobs.length}`;
+    let done=0;
+    const results=await Promise.all(jobs.map(async job=>{
+      const r=await pollMaterialJob(job,statusEndpoint,msg=>{btn.textContent=`${msg}　${done} / ${jobs.length}`;});
+      done++;btn.textContent=`AI解析完了　${done} / ${jobs.length}`;
+      return r;
+    }));
+
+    let data;
+    if(results.length===1){
+      data=mergeMaterialResults(results);
+    }else{
+      const synthId=await startSynthesisJob(results,synthesisEndpoint,msg=>{btn.textContent=msg;});
+      data=await pollSynthesisJob(synthId,statusEndpoint,msg=>{btn.textContent=msg;});
+    }
+
     (data.fileRoles||[]).forEach(r=>{
       const original=r.filename?.replace(/__P\d{3}\.jpg$/,'');
       const f=all.find(x=>x.name===r.filename||x.name===original)||prepared.find(x=>x.name===r.filename);
-      if(f && !f.role)f.role=r.role||'reference';
-      else if(f)f.role=r.role||'reference';
+      if(f)f.role=r.role||'reference';
     });
     renderUploaded();
     applyProjectSummary(data.summary||{});

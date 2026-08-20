@@ -1,4 +1,4 @@
-# KOBAN AI v35
+# KOBAN AI v49
 
 撮影設計AIのブラウザ版＋Vercel Functions実装です。
 
@@ -146,3 +146,13 @@ Vercelの Project Settings → Environment Variables に以下を設定します
 - クライアント側の1ファイル目安を2.6MBに引き下げ、PDF/画像は自動圧縮・分割。
 - AI解析APIへの送信を1ファイルずつに変更し、複数資料をまとめて投入してもHTTPリクエスト自体は小さく保つ。
 - API側の1ファイル上限を3.2MBに設定。
+
+
+## v49 変更：大容量資料の非同期AI解析
+- Vercel Functionの同期処理から、OpenAI Responses APIのBackground modeへAI解析を分離。
+- 1回のVercel実行では「受領 → OpenAI Files API登録 → Background Response開始」までに限定。
+- ブラウザ側で大容量PDF / PPTXをページ・スライド画像へ変換し、2.4MB程度の小さなジョブ単位で並列投入。
+- `api/project-materials-status.js` がBackground Responseをポーリングし、解析完了後のJSONを取得。
+- 複数資料は個別解析後に `api/project-materials-synthesis.js` で案件全体をBackground modeで統合。
+- UIは「資料を準備中 → AI解析中 → 案件資料を統合中 → 解析完了」の進捗を表示。
+- これにより、PPTX等の重い資料を1回のVercel Function内で長時間解析して `FUNCTION_INVOCATION_TIMEOUT` になる構成を避ける。
