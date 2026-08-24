@@ -214,6 +214,10 @@ body.print-a3{--print-size:a3}
 .small-btn{font-size:9px;padding:6px 9px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer}
 .small-btn:hover{border-color:#aab8aa}
 .ai-hint{padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--theme-soft);font-size:9px;line-height:1.5}
+
+/* v50: human-confirmed storyboard / layout intake */
+.layout-intake{margin-top:12px;border:1px solid var(--theme-line);border-radius:9px;background:var(--theme-soft);overflow:hidden}.layout-intake-head{padding:12px 13px;border-bottom:1px solid var(--theme-line);display:flex;align-items:center;gap:8px}.layout-intake-head strong{font-size:11px}.layout-intake-body{padding:12px 13px;background:#fff}.layout-upload{border:1px dashed #b9c7b9;border-radius:8px;padding:13px;background:#fafcf9;position:relative}.layout-upload input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}.layout-upload b{display:block;font-size:10px;margin-bottom:3px}.layout-upload small{font-size:8px;color:var(--muted)}.layout-files{display:grid;gap:6px;margin-top:8px}.layout-file{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:7px;padding:7px 8px;background:#fff}.layout-file .filemeta{min-width:0;flex:1}.layout-file .filename{font-size:9px}.layout-file .filesub{font-size:7px;color:var(--muted)}.layout-file button{border:0;background:none;color:#899089;cursor:pointer}.layout-structure{width:100%;min-height:120px;border:1px solid #cfd5cf;border-radius:7px;padding:10px;font-size:10px;line-height:1.55;resize:vertical;outline:none}.layout-structure:focus{border-color:var(--focus);box-shadow:0 0 0 2px rgba(125,155,128,.12)}.layout-help{font-size:8px;color:var(--muted);line-height:1.55;margin-top:5px}.manual-region-wrap{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(310px,.8fr);gap:12px}.manual-pages{display:flex;flex-direction:column;gap:9px}.manual-page-card{border:1px solid var(--line);border-radius:9px;background:#fff;overflow:hidden}.manual-page-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);background:#fafcf9}.manual-page-head strong{font-size:11px}.manual-page-head small{color:var(--muted);font-size:8px}.manual-page-head .spacer{flex:1}.material-entry{display:grid;grid-template-columns:78px 86px minmax(0,1fr) 30px;gap:6px;align-items:center;padding:8px 10px;border-bottom:1px solid #edf0ed}.material-entry:last-child{border-bottom:0}.material-entry select,.material-entry input{width:100%;border:1px solid #cfd5cf;border-radius:6px;padding:6px 7px;font-size:9px;background:#fff;outline:none}.material-entry .delete{border:0;background:none;color:#899089;font-size:13px;cursor:pointer}.manual-add{padding:8px 10px;background:#fbfcfa;border-top:1px solid var(--line)}.manual-add button{font-size:9px}.page-empty{padding:13px;color:var(--muted);font-size:9px}.layout-reference{border:1px solid var(--line);border-radius:9px;background:#fff;overflow:hidden}.layout-reference .ref-body{padding:10px}.ref-file{padding:8px;border:1px solid var(--line);border-radius:7px;margin-bottom:6px;font-size:9px}.ref-file:last-child{margin-bottom:0}.ref-label{font-size:8px;color:var(--muted);font-weight:800;margin-bottom:7px}.manual-note{font-size:9px;color:var(--muted);line-height:1.55}.manual-toolbar{display:flex;gap:7px;align-items:center;margin-bottom:10px}.manual-toolbar .small-btn.active{border-color:var(--accent);background:var(--theme-soft);font-weight:800}.manual-page-card.ai-suggested{box-shadow:0 0 0 2px rgba(110,139,114,.08)}
+@media(max-width:1000px){.manual-region-wrap{grid-template-columns:1fr}}
 @media(max-width:900px){.assign-grid{grid-template-columns:1fr}.order-board{grid-template-columns:1fr}.plan-cards{grid-template-columns:1fr}}
 
 
@@ -437,6 +441,8 @@ body.print-a3{--print-size:a3}
 
 
 .layout-page-overlay{position:absolute;border:1.5px dashed #718c74;box-sizing:border-box;background:rgba(113,140,116,.035);cursor:pointer;z-index:2}.layout-page-overlay.active{border:2px solid #334f38;background:rgba(113,140,116,.08)}.layout-page-label{position:absolute;left:4px;top:4px;background:#fff;border:1px solid #d7ddd7;border-radius:4px;padding:2px 5px;font-size:7px;font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.08)}.layout-region-overlay{position:absolute;border:2px solid #718c74;background:rgba(113,140,116,.14);box-sizing:border-box;cursor:pointer;z-index:3}.layout-region-overlay span{position:absolute;left:3px;top:3px;background:#fff;padding:2px 4px;border-radius:3px;font-size:6px;font-weight:800}.layout-source-note{font-size:7px;color:var(--muted);margin-top:5px}.layout-page-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}.layout-page-chip{border:1px solid var(--line);background:#fff;border-radius:5px;padding:5px 7px;font-size:7px;cursor:pointer}.layout-page-chip.active{background:#eef4ee;border-color:#718c74;font-weight:800}
+
+.autosave-status{font-size:9px;color:#6f776f;padding:6px 9px;border:1px solid #d8ddd8;border-radius:999px;background:#fafcf9;white-space:nowrap}.autosave-status.saving{color:#806c4a;background:#fcfaf4;border-color:#e5dcc7}.autosave-status.saved{color:#5e765f}.autosave-status.error{color:#9a5b5b;background:#fff8f8;border-color:#ead0d0}
 </style>
 
 <script>
@@ -490,7 +496,7 @@ body.print-a3{--print-size:a3}
 </script></head>
 <body><a href="index.html" style="position:fixed;left:18px;top:18px;z-index:99999;font:11px Arial;color:#666;text-decoration:none;background:#fff;border:1px solid #ddd;border-radius:7px;padding:7px 10px">← 案件一覧</a>
 <header class="topbar">
-<div class="logo">KOBAN AI</div><div class="project"></div><div class="spacer"></div>
+<div class="logo">KOBAN AI</div><div class="project"></div><div id="autosaveStatus" class="autosave-status">自動保存：準備中</div><div class="spacer"></div>
 <button class="btn ai" onclick="aiOptimize()">AIで再構成</button><button class="btn" onclick="printMode('a4')">A4 PDF</button><button class="btn" onclick="printMode('a3')">A3撮影用PDF</button><button class="btn primary" onclick="exportCSV()">スプレッドシート用CSV</button>
 </header>
 
@@ -521,7 +527,24 @@ body.print-a3{--print-size:a3}
             <div class="field"><span class="field-label">採用ターゲット</span><input value=""></div>
             <div class="field"><span class="field-label">撮影可能時間</span><input value=""></div>
           </div>
-          <div class="dropzone material-dropzone" id="projectDropzone" style="margin-top:10px"><input type="file" id="projectFiles" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.md,.jpg,.jpeg,.png,.webp"><b>案件資料をまとめて追加</b><small>PDF / PPTX / DOCX / TXT / 画像など。概要・台割・デザインを分けず、そのまま複数ファイル追加できます。</small></div><div id="projectUploaded" class="uploaded-list"></div>
+          <div class="dropzone material-dropzone" id="projectDropzone" style="margin-top:10px"><input type="file" id="projectFiles" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.md,.jpg,.jpeg,.png,.webp"><b>案件資料を追加</b><small>企業概要・ヒアリング・コンセプトなど、案件理解に必要な資料をまとめて追加できます。台割は下の専用欄へ。</small></div><div id="projectUploaded" class="uploaded-list"></div>
+
+<div class="layout-intake">
+  <div class="layout-intake-head"><strong>台割について</strong><span class="badge-critical" style="margin-left:auto">②素材領域の基礎情報</span></div>
+  <div class="layout-intake-body">
+    <div class="layout-upload" id="layoutDropzone"><input type="file" id="layoutFiles" multiple accept=".pdf,.jpg,.jpeg,.png,.webp"><b>台割PDF・デザインカンプを追加</b><small>パンフレット：PDF 1P＝パンフレット1P ／ Web：PDF 1P＝Web 1ページ。複数ファイルにも対応。</small></div>
+    <div id="layoutUploaded" class="layout-files"></div>
+    <div style="margin-top:10px"><div class="ref-label">台割の構成</div><textarea id="layoutStructure" class="layout-structure" placeholder="例：
+全6P。
+P1：表紙
+P2：会社紹介／写真2点
+P3：事業紹介／写真3点
+P4：社員紹介／写真1点
+P5：仕事紹介／写真2点
+P6：福利厚生／写真1点"></textarea><div class="layout-help">ページ構成はAIに推測させず、ここに共有された内容を正として②のページ骨格を作ります。PDFは各ページのレイアウト・素材領域を確認するための参考資料として使います。</div></div>
+    <div style="margin-top:10px"><div class="ref-label">台割に関する補足</div><textarea id="layoutNotes" class="layout-structure" style="min-height:74px" placeholder="見開き、必ず撮影したい素材、既存素材を使う箇所など"></textarea></div>
+  </div>
+</div>
           <div class="filelist"></div></div><button class="remove">×</button></div>
             <div class="fileitem"><div class="fileicon">TXT</div><div class="filemeta"><div class="filename"></div><div class="filesub">補足情報・注意事項</div></div><button class="remove">×</button></div>
           </div>
@@ -529,17 +552,14 @@ body.print-a3{--print-size:a3}
       </div>
 
       <div class="card material-card">
-        <div class="card-head"><strong>制作物・クリエイティブ</strong><span>撮影設計にクリティカルな情報</span><span style="margin-left:auto" class="badge-critical">重要</span></div>
-        <div class="card-body">
-          <div class="material-list"></div></div><span class="badge-critical">AIが資料種別を判定</span></div>
-          <div class="upload-summary" style="margin-top:8px">アップロード後、AIが資料を「案件前提」「台割・デザイン」「参考資料」などに自動分類します。台割・デザイン資料は、別系統で優先的に解析します。</div>
-        </div>
+        <div class="card-head"><strong>制作物・クリエイティブ</strong><span>撮影設計に必要な前提</span></div>
+        <div class="card-body"><div class="mode-note">案件資料はAIに案件理解のために読み込ませます。台割は自動で②へ反映せず、構成をもとにページ骨格を作成し、PDFを見ながら素材領域を確認します。</div></div>
       </div>
     </div>
 
     <div>
       <div class="card">
-        <div class="cut-auto-visual" style="margin-bottom:8px"><div><div class="label">共有資料をAIに読み込ませる</div><div class="sub">案件資料をまとめて解析。資料種別はAIが自動判定し、台割・デザインは専用解析します</div></div><div class="spacer"></div><button id="readMaterialsBtn" class="small-btn" onclick="readProjectMaterials()">AIに読み込ませる</button></div><div class="card-head"><strong>AIが理解した案件の前提</strong></div>
+        <div class="cut-auto-visual" style="margin-bottom:8px"><div><div class="label">共有資料をAIに読み込ませる</div><div class="sub">案件資料を解析して案件の前提を整理。台割は別欄の構成を正として②で確認します</div></div><div class="spacer"></div><button id="readMaterialsBtn" class="small-btn" onclick="readProjectMaterials()">AIに読み込ませる</button></div><div class="card-head"><strong>AIが理解した案件の前提</strong></div>
         <div class="card-body">
           <div class="ai-understanding ai-result">
             <div class="summary-row"><div class="summary-label">案件</div><div class="summary-value"><input class="ai-editable" value="" aria-label="案件"></div></div>
@@ -569,33 +589,17 @@ body.print-a3{--print-size:a3}
 
 <section class="prep" id="regionScreen" style="display:none">
   <div style="margin-bottom:13px;display:flex;justify-content:space-between;align-items:end">
-    <div><div style="font-size:20px;font-weight:850">制作物の素材領域を確認</div><div class="mode-note">AIが写真・動画・図版などの候補領域を検出しました。クリックして種類を確定、必要ならドラッグ追加します。</div></div>
-    <div style="display:flex;align-items:center;gap:8px"><button class="small-btn" onclick="analyzeLayoutRegions()">AIで台割を解析</button><span class="candidate-count" id="regionCount">写真候補 4 / 動画候補 1 / 図版候補 1</span></div>
+    <div><div style="font-size:20px;font-weight:850">制作物の素材領域を確認</div><div class="mode-note">台割構成からページの骨格を作り、PDFを見ながら「撮影が必要な素材」を人間が確認・追加します。AIは候補提案を補助します。</div></div>
+    <div class="manual-toolbar"><button class="small-btn" onclick="suggestMaterialRegions()">AIに素材候補を提案してもらう</button><span class="candidate-count" id="regionCount">ページ 0 / 素材 0</span></div>
   </div>
-  <div class="prep-grid" style="grid-template-columns:minmax(0,1.5fr) minmax(280px,.5fr)">
-    <div class="card">
-      <div class="card-head"><strong>台割プレビュー</strong><span id="layoutMapMeta">AI解析後にページ構造を表示</span></div>
-      <div class="card-body">
-        <div class="board">
-          <div class="board-page" id="boardPage"></div><div id="layoutPageList" class="layout-page-list"></div><div id="layoutSourceNote" class="layout-source-note"></div></div></div>
+  <div class="manual-region-wrap">
+    <div class="manual-pages" id="manualPages"></div>
+    <div>
+      <div class="layout-reference">
+        <div class="card-head"><strong>共有した台割</strong><span>レイアウト確認用</span></div>
+        <div class="ref-body"><div id="manualLayoutFiles"></div><div class="manual-note" style="margin-top:8px">PDFは「何を撮るべきか」をAIに決めさせるためではなく、各ページの写真・動画・図版の位置や大きさを確認するために使います。</div></div>
       </div>
-    </div>
-
-    <div class="region-side">
-      <strong style="font-size:12px">選択中の領域</strong>
-      <div id="regionEmpty" class="region-empty">台割上の候補をクリックしてください。</div>
-      <div id="regionDetail" style="display:none">
-        <div style="margin-top:9px;font-size:11px;font-weight:800" id="regionName">P1メインビジュアル</div>
-        <div class="mode-note" style="margin-top:3px">AIが写真領域として認識</div>
-        <div class="region-type">
-          <button class="typebtn active" onclick="setRegionType(this,'photo')">写真</button>
-          <button class="typebtn" onclick="setRegionType(this,'video')">動画</button>
-          <button class="typebtn" onclick="setRegionType(this,'diagram')">図版</button>
-        </div>
-        <div class="region-field"><label>用途</label><input id="regionPurpose" value=""></div>
-        <div class="region-field"><label>AIへの補足</label><textarea id="regionNote"></textarea></div>
-        <div class="prep-actions" style="margin-top:10px"><button class="btn" onclick="confirmRegion()">領域を確定</button></div>
-      </div>
+      <div class="card" style="margin-top:12px"><div class="card-head"><strong>台割構成</strong></div><div class="card-body"><div id="manualStructurePreview" class="manual-note" style="white-space:pre-wrap"></div></div></div>
     </div>
   </div>
   <div class="nextbar"><button class="btn" onclick="backToPrep()">← 案件準備へ戻る</button><button class="btn primary" onclick="goToCutStep()">カット設計へ進む →</button></div>
@@ -1127,6 +1131,7 @@ function navigateStep(step){
 }
 
 function goToRegionStep(){
+  initManualLayout();
   navigateStep(2);
 }
 function backToPrep(){
@@ -2055,6 +2060,26 @@ async function structureActiveCut(){
 }
 
 
+const layoutUploads={all:[]};
+const manualPagesState=[];
+function addLayoutFiles(files){[...files].forEach(file=>layoutUploads.all.push({file,name:file.name,size:file.size,type:file.type}));renderLayoutUploads();}
+function removeLayoutFile(i){layoutUploads.all.splice(i,1);renderLayoutUploads();}
+function renderLayoutUploads(){const root=document.getElementById('layoutUploaded');const ref=document.getElementById('manualLayoutFiles');if(root)root.innerHTML=layoutUploads.all.map((f,i)=>`<div class="layout-file"><div class="fileicon">${fileKind(f.name)}</div><div class="filemeta"><div class="filename">${escapeHtml(f.name)}</div><div class="filesub">${Math.max(1,Math.round(f.size/1024))} KB</div></div><button onclick="removeLayoutFile(${i});return false">×</button></div>`).join('');if(ref)ref.innerHTML=layoutUploads.all.length?layoutUploads.all.map(f=>`<div class="ref-file"><strong>${escapeHtml(f.name)}</strong><div style="color:var(--muted);margin-top:3px">${Math.max(1,Math.round(f.size/1024))} KB</div></div>`).join(''):'<div class="manual-note">まだ台割PDFがありません。</div>';}
+function parseLayoutStructure(text){
+  const lines=String(text||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const pages=[];
+  for(const line of lines){const m=line.match(/^(?:P|p)?\s*(\d+)\s*[:：\-]?\s*(.*)$/);if(m){pages.push({page:Number(m[1]),title:m[2]||`P${m[1]}`,materials:[]});continue;}const total=line.match(/(?:全|計)\s*(\d+)\s*[PＰ]/i);if(total && !pages.length){for(let i=1;i<=Number(total[1]);i++)pages.push({page:i,title:`P${i}`,materials:[]});}}
+  if(!pages.length){const total=lines.join(' ').match(/(?:全|計)\s*(\d+)\s*[PＰ]/i);if(total)for(let i=1;i<=Number(total[1]);i++)pages.push({page:i,title:`P${i}`,materials:[]});}
+  return pages;
+}
+function syncManualPages(){const text=document.getElementById('layoutStructure')?.value||'';const parsed=parseLayoutStructure(text);const existing=new Map(manualPagesState.map(p=>[p.page,p]));manualPagesState.length=0;for(const p of parsed){manualPagesState.push(existing.get(p.page)||p);manualPagesState[manualPagesState.length-1].title=p.title||manualPagesState[manualPagesState.length-1].title;}renderManualPages();}
+function materialTypeOptions(selected){return ['photo','video','diagram','other'].map(v=>`<option value="${v}" ${v===selected?'selected':''}>${v==='photo'?'写真':v==='video'?'動画':v==='diagram'?'図版':'その他'}</option>`).join('');}
+function renderManualPages(){const root=document.getElementById('manualPages');if(!root)return;root.innerHTML=manualPagesState.length?manualPagesState.map((p,pi)=>`<div class="manual-page-card" id="manualPage${p.page}"><div class="manual-page-head"><strong>P${p.page}</strong><span>${escapeHtml(p.title||'')}</span><div class="spacer"></div><button class="small-btn" onclick="addManualMaterial(${pi})">＋ 素材を追加</button></div><div class="manual-materials">${(p.materials||[]).length?p.materials.map((m,mi)=>`<div class="material-entry"><select onchange="updateManualMaterial(${pi},${mi},'type',this.value)">${materialTypeOptions(m.type)}</select><input value="${escapeHtml(m.count||1)}" title="必要点数" onchange="updateManualMaterial(${pi},${mi},'count',this.value)"><input value="${escapeHtml(m.description||'')}" placeholder="何を撮る／使う素材か" onchange="updateManualMaterial(${pi},${mi},'description',this.value)"><button class="delete" onclick="removeManualMaterial(${pi},${mi})">×</button></div>`).join(''):'<div class="page-empty">素材を追加してください。PDFを見ながら、撮影が必要な領域だけ登録します。</div>'}</div></div>`).join(''):'<div class="card"><div class="card-body"><div class="page-empty">台割構成を入力すると、ページごとの確認欄がここにできます。</div></div></div>';const count=manualPagesState.reduce((n,p)=>n+(p.materials||[]).length,0);const c=document.getElementById('regionCount');if(c)c.textContent=`ページ ${manualPagesState.length} / 素材 ${count}`;}
+function addManualMaterial(pi){manualPagesState[pi].materials=manualPagesState[pi].materials||[];manualPagesState[pi].materials.push({type:'photo',count:1,description:''});renderManualPages();}
+function removeManualMaterial(pi,mi){manualPagesState[pi].materials.splice(mi,1);renderManualPages();}
+function updateManualMaterial(pi,mi,key,val){manualPagesState[pi].materials[mi][key]=val;}
+function initManualLayout(){syncManualPages();const sp=document.getElementById('manualStructurePreview');if(sp)sp.textContent=document.getElementById('layoutStructure')?.value||'台割構成が未入力です。';renderLayoutUploads();}
+function suggestMaterialRegions(){if(!manualPagesState.length){alert('先に「台割の構成」を入力してください。');return;}manualPagesState.forEach(p=>{if(!(p.materials||[]).length)p.materials.push({type:'photo',count:1,description:`${p.title||`P${p.page}`}のメインビジュアル候補`});});renderManualPages();alert('各ページに最小1件の写真候補を追加しました。実際に必要な素材だけ確認・修正してください。');}
 const projectUploads={all:[]};
 let layoutMapsState=[];
 let activeLayoutMapIndex=0;
@@ -2070,6 +2095,7 @@ function addProjectFiles(files){[...files].forEach(file=>projectUploads.all.push
 function removeProjectFile(i){projectUploads.all.splice(i,1);renderUploaded();}
 function setupProjectUpload(){const input=document.getElementById('projectFiles'),zone=document.getElementById('projectDropzone');if(!input||!zone)return;input.addEventListener('change',e=>addProjectFiles(e.target.files));['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add('dragover')}));['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove('dragover')}));zone.addEventListener('drop',e=>addProjectFiles(e.dataTransfer.files));}
 setupProjectUpload();
+(function setupLayoutUpload(){const input=document.getElementById('layoutFiles'),zone=document.getElementById('layoutDropzone');if(!input||!zone)return;input.addEventListener('change',e=>addLayoutFiles(e.target.files));['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add('dragover')}));['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove('dragover')}));zone.addEventListener('drop',e=>addLayoutFiles(e.dataTransfer.files));const ta=document.getElementById('layoutStructure');if(ta)ta.addEventListener('input',syncManualPages);})();
 
 async function getPdfJs(){
   if(window.__kobanPdfJs)return window.__kobanPdfJs;
@@ -2347,8 +2373,8 @@ async function readProjectMaterials(){
     });
     renderUploaded();
     applyProjectSummary(data.summary||{});
-    if(Array.isArray(data.layoutMaps)&&data.layoutMaps.length)renderAIRegions(data.regions||[],data.layoutMaps);
-    else if(Array.isArray(data.regions)&&data.regions.length)renderAIRegions(data.regions,[]);
+    // v50: 台割はAI解析結果を②へ自動反映しない。案件理解だけを更新し、②は台割構成を正として手動確認する。
+    if(document.getElementById('layoutStructure')?.value) initManualLayout();
     btn.textContent='解析完了';
   }catch(e){console.error(e);btn.textContent='解析エラー';alert(e.message||'資料解析に失敗しました');}
   finally{btn.disabled=false;setTimeout(()=>btn.textContent='AIに読み込ませる',2200);}
@@ -2388,7 +2414,7 @@ function renderLayoutOverlays(){
 }
 function renderLayoutPageList(){const list=document.getElementById('layoutPageList');if(!list)return;list.innerHTML=layoutMapsState.flatMap((m,mi)=>(m.pages||[]).map(pg=>`<button class="layout-page-chip ${mi===activeLayoutMapIndex&&pg.page===activeLayoutPage?'active':''}" onclick="selectLayoutPage(${mi},${pg.page})">${escapeHtml(pg.label||('P'+pg.page))}</button>`)).join('');const meta=document.getElementById('layoutMapMeta'),lm=layoutMapsState[activeLayoutMapIndex];if(meta&&lm)meta.textContent=`${lm.sourceName||lm.filename||'台割'} / ${lm.pageCount||lm.pages?.length||0}P / P${activeLayoutPage}`;}
 function selectLayoutPage(mi,page){activeLayoutMapIndex=mi;activeLayoutPage=page;renderLayoutOverlays();renderLayoutPageList();}
-async function analyzeLayoutRegions(){if(!projectUploads.all.length){alert('先に案件資料を追加してください。AIが台割・デザイン資料を自動判定して解析します。');return;}await readProjectMaterials();}
+async function analyzeLayoutRegions(){suggestMaterialRegions();}
 
 async function fetchRealCutCandidates(query,mode){const s=getProviderSettings();const endpoint=s.endpoint||'/api/cut-images';const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,mode,cutId:activeCutRefId,projectContext:getProjectContextForCuts?getProjectContextForCuts():'',cutContext:getCutContext?getCutContext(activeCutRefId):'',cutIntent:activeCutIntent||{}})});if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||'画像候補APIに接続できませんでした');}return res.json();}
 
@@ -2407,6 +2433,131 @@ async function generateOrderPlans(request){
 
 <script>
 (function(){
+  const params = new URLSearchParams(location.search);
+  const fresh = params.get('fresh') === '1';
+  const projectId = params.get('project') || 'default';
+  const key = 'koban.autosave.v2.' + projectId;
+  const status = () => document.getElementById('autosaveStatus');
+  let restoring = false;
+  let timer = null;
+  let lastSaved = 0;
+
+  function setStatus(text, cls){
+    const el=status(); if(!el)return;
+    el.textContent='自動保存：'+text;
+    el.className='autosave-status'+(cls?' '+cls:'');
+  }
+  function fieldKey(el,i){
+    return el.id || el.name || el.getAttribute('data-autosave-key') || (el.tagName.toLowerCase()+'-'+i);
+  }
+  function collectFields(){
+    const fields=[...document.querySelectorAll('input,textarea,select')];
+    return fields.reduce((out,el,i)=>{
+      if(el.type==='file') return out;
+      const k=fieldKey(el,i);
+      out[k]={tag:el.tagName.toLowerCase(),type:el.type||'',value:el.value,checked:!!el.checked};
+      return out;
+    },{});
+  }
+  function restoreFields(fields){
+    if(!fields)return;
+    const all=[...document.querySelectorAll('input,textarea,select')];
+    all.forEach((el,i)=>{
+      if(el.type==='file')return;
+      const d=fields[fieldKey(el,i)]; if(!d)return;
+      if(el.type==='checkbox'||el.type==='radio') el.checked=!!d.checked;
+      else el.value=d.value ?? '';
+    });
+  }
+  function collectState(){
+    const state={
+      version:2,
+      savedAt:new Date().toISOString(),
+      step:document.querySelector('.step.active')?.dataset.step || '1',
+      fields:collectFields(),
+      manualPages:typeof manualPagesState!=='undefined' ? manualPagesState : [],
+      masters:typeof masterState!=='undefined' ? masterState : null,
+      layoutMaps:typeof layoutMapsState!=='undefined' ? layoutMapsState : [],
+      activeLayoutMapIndex:typeof activeLayoutMapIndex!=='undefined'?activeLayoutMapIndex:0,
+      activeLayoutPage:typeof activeLayoutPage!=='undefined'?activeLayoutPage:1,
+      projectFiles:typeof projectUploads!=='undefined' ? projectUploads.all.map(f=>({name:f.name,size:f.size,type:f.type,role:f.role||'auto'})) : [],
+      layoutFiles:typeof layoutUploads!=='undefined' ? layoutUploads.all.map(f=>({name:f.name,size:f.size,type:f.type})) : []
+    };
+    return state;
+  }
+  function saveNow(){
+    if(restoring)return;
+    try{
+      const state=collectState();
+      localStorage.setItem(key,JSON.stringify(state));
+      lastSaved=Date.now();
+      setStatus('保存済み','saved');
+    }catch(e){
+      console.warn('KOBAN autosave failed',e);
+      setStatus('保存できません','error');
+    }
+  }
+  function scheduleSave(){
+    if(restoring)return;
+    setStatus('保存中…','saving');
+    clearTimeout(timer); timer=setTimeout(saveNow,500);
+  }
+  function restoreState(){
+    if(fresh)return;
+    let raw=null;
+    try{raw=localStorage.getItem(key);}catch(e){return;}
+    if(!raw){setStatus('有効','saved');return;}
+    try{
+      const state=JSON.parse(raw);
+      restoring=true;
+      restoreFields(state.fields);
+      if(Array.isArray(state.manualPages) && typeof manualPagesState!=='undefined'){
+        manualPagesState.length=0; state.manualPages.forEach(x=>manualPagesState.push(x));
+        if(typeof renderManualPages==='function')renderManualPages();
+      }
+      if(state.masters && typeof masterState!=='undefined'){
+        ['person','location'].forEach(t=>{if(Array.isArray(state.masters[t]))masterState[t]=state.masters[t];});
+        if(typeof initMasters==='function')initMasters();
+      }
+      if(Array.isArray(state.layoutMaps) && typeof layoutMapsState!=='undefined'){
+        layoutMapsState=state.layoutMaps;
+        activeLayoutMapIndex=state.activeLayoutMapIndex||0;
+        activeLayoutPage=state.activeLayoutPage||1;
+      }
+      if(state.step && typeof navigateStep==='function') navigateStep(Number(state.step));
+      setStatus('復元済み','saved');
+      window.KOBAN_AUTOSAVE_RESTORED=true;
+      setTimeout(()=>{restoring=false;},100);
+    }catch(e){
+      console.warn('KOBAN autosave restore failed',e);
+      restoring=false; setStatus('復元失敗','error');
+    }
+  }
+  function clearSaved(){
+    try{localStorage.removeItem(key);setStatus('削除済み','saved');}catch(e){}
+  }
+  window.KOBAN_AUTOSAVE={save:saveNow,clear:clearSaved,key};
+
+  function init(){
+    // Restore after the app's own initial render has run.
+    setTimeout(restoreState,250);
+    document.addEventListener('input',scheduleSave,true);
+    document.addEventListener('change',scheduleSave,true);
+    window.addEventListener('beforeunload',saveNow);
+    setInterval(()=>{
+      if(!restoring && Date.now()-lastSaved>12000) saveNow();
+    },10000);
+    // Button-driven changes (add/remove material, uploaded files, master options) do not always emit input/change.
+    const observeIds=['manualPages','layoutUploaded','projectUploaded','personMaster','locationMaster','cutList','orderList'];
+    const observer=new MutationObserver(()=>{ if(!restoring) scheduleSave(); });
+    observeIds.forEach(id=>{const el=document.getElementById(id);if(el)observer.observe(el,{subtree:true,childList:true,characterData:true,attributes:true});});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
+<script>
+(function(){
   const fresh = new URLSearchParams(location.search).get('fresh') === '1';
   if(!fresh) return;
   function clean(){
@@ -2417,7 +2568,7 @@ async function generateOrderPlans(request){
     });
     document.querySelectorAll('[contenteditable="true"]').forEach(function(el){el.innerHTML='';});
     // Remove visible preloaded uploaded-material rows/cards, while preserving upload/drop zones.
-    document.querySelectorAll('[data-demo],[data-seed],.uploaded-file,.file-item,.material-item').forEach(function(el){el.remove();});
+    document.querySelectorAll('[data-demo],[data-seed],.uploaded-file,.file-item,.material-item').forEach(function(el){el.remove();}); layoutUploads.all.length=0; manualPagesState.length=0; renderLayoutUploads();
     // Clear obvious demo text nodes only when they are in editable/input-like areas.
     document.querySelectorAll('textarea, input').forEach(function(el){el.value='';});
   }

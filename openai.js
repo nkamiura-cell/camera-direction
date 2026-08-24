@@ -36,6 +36,17 @@ export async function uploadOpenAIFile(buffer, filename, mimeType) {
   return data;
 }
 
+export async function openaiGet(path) {
+  const key = requireKey();
+  const res = await fetch(`${OPENAI_BASE}${path}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${key}` }
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error?.message || `OpenAI API error: ${res.status}`);
+  return data;
+}
+
 export function parseJson(text) {
   if (!text) return null;
   try { return JSON.parse(text); } catch {}
